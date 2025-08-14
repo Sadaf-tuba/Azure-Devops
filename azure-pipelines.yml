@@ -1,0 +1,25 @@
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  DOTNET_VERSION: '9.0.8'
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK $(DOTNET_VERSION)'
+    inputs:
+      packageType: 'sdk'
+      version: '$(DOTNET_VERSION)'
+      includePreview: true
+
+  - script: dotnet --info
+    displayName: 'Verify .NET SDK installation'
+
+  - script: dotnet build --configuration Release
+    displayName: 'Build project'
+
+  - script: dotnet run --configuration Release
+    displayName: 'Run project'
