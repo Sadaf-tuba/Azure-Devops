@@ -23,3 +23,13 @@ steps:
 
   - script: dotnet run --configuration Release
     displayName: 'Run project'
+  
+  - script: dotnet publish --configuration Release --output $(Build.ArtifactStagingDirectory)
+    displayName: 'Publish Project'
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'container'
+
