@@ -6,6 +6,8 @@ pool:
 
 variables:
   DOTNET_VERSION: '9.0.304'
+  AZURE_WEBAPP_NAME: 'dotnet-webapp'
+  AZURE_SUBSCRIPTION: 'ADO -AZURE'
 
 steps:
   - task: UseDotNet@2
@@ -26,6 +28,14 @@ steps:
   
   - script: dotnet publish --configuration Release --output $(Build.ArtifactStagingDirectory)
     displayName: 'Publish Project'
+  
+  - task: ArchiveFiles@2
+    displayName: 'archive publushed files'
+    inputs:
+     rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+     includeRootFolder: false
+     archiveType: 'zip'
+     archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip' 
 
   - task: PublishBuildArtifacts@1
     inputs:
@@ -33,3 +43,9 @@ steps:
       ArtifactName: 'drop'
       publishLocation: 'container'
 
+  - task: AzureWebApp@1
+    displayName: 'Deploy to App Service'
+    inputs:
+     azureSubscription: '$(AZURE_SUBSCRIPTION)'
+     appName: '$(AZURE_WEBAPP_NAME)'
+     package: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
